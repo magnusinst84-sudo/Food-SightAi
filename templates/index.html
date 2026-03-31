@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FoodSight AI - Classify Indian food dishes using Deep Learning">
+    <meta name="keywords" content="food classification, AI, machine learning, Indian food, deep learning">
+    <meta name="author" content="FoodSight AI Team">
+
+    <title>FoodSight AI - Indian Food Classification</title>
+
+    <!-- Favicon -->
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍛</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- html2canvas for Share feature -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/portion_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/premium_features.css') }}">
+</head>
+
+<body>
+
+    <!-- ===== FULL-PAGE SIGN-IN SCREEN ===== -->
+    <div id="authScreen" class="auth-screen" style="display:none;">
+        <div class="auth-bg-blobs">
+            <div class="blob blob-1"></div>
+            <div class="blob blob-2"></div>
+            <div class="blob blob-3"></div>
+        </div>
+        <div class="auth-card">
+            <div class="auth-logo">🍛</div>
+            <h1 class="auth-title">FoodSight AI</h1>
+            <p class="auth-subtitle">Your smart Indian food &amp; nutrition companion</p>
+
+            <!-- Login Form -->
+            <form id="authLoginForm" class="auth-form">
+                <h2 class="auth-form-title">Welcome Back</h2>
+                <div class="auth-input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="authLoginUsername" placeholder="Username" required autocomplete="username">
+                </div>
+                <div class="auth-input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="authLoginPassword" placeholder="Password" required
+                        autocomplete="current-password">
+                </div>
+                <div id="authLoginError" class="auth-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary auth-btn">Sign In <i
+                        class="fas fa-arrow-right"></i></button>
+                <p class="auth-toggle-text">New here? <a href="#" id="showSignupToggle">Create an account</a></p>
+                <div class="auth-divider"><span>or</span></div>
+                <button type="button" id="guestBtn" class="btn btn-secondary auth-btn-ghost">Continue as Guest</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="authSignupForm" class="auth-form" style="display:none;">
+                <h2 class="auth-form-title">Create Account</h2>
+                <div class="auth-input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="authSignupUsername" placeholder="Choose a username" required
+                        autocomplete="username">
+                </div>
+                <div class="auth-input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="authSignupPassword" placeholder="Create a password" required
+                        autocomplete="new-password">
+                </div>
+                <div id="authSignupError" class="auth-error" style="display:none;"></div>
+                <button type="submit" class="btn btn-primary auth-btn">Create Account <i
+                        class="fas fa-arrow-right"></i></button>
+                <p class="auth-toggle-text">Already have an account? <a href="#" id="showLoginToggle">Sign In</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== PROFILE SETUP WIZARD ===== -->
+    <div id="profileWizard" class="profile-wizard-modal" style="display:none;">
+        <div class="profile-wizard-card glass-card">
+            <div class="wizard-progress">
+                <div class="wizard-dot active" data-step="1"></div>
+                <div class="wizard-line"></div>
+                <div class="wizard-dot" data-step="2"></div>
+                <div class="wizard-line"></div>
+                <div class="wizard-dot" data-step="3"></div>
+                <div class="wizard-line"></div>
+                <div class="wizard-dot" data-step="4"></div>
+            </div>
+
+            <!-- Step 1 -->
+            <div class="wizard-step" id="wizardStep1">
+                <div class="wizard-icon">👤</div>
+                <h2>Tell us about yourself</h2>
+                <p class="wizard-desc">Helps us personalise your nutrition goals</p>
+                <div class="wizard-form">
+                    <input type="text" id="wName" placeholder="Your name (optional)" class="wizard-input">
+                    <div class="wizard-row">
+                        <input type="number" id="wAge" placeholder="Age" min="10" max="100" class="wizard-input"
+                            required>
+                        <select id="wGender" class="wizard-input" required>
+                            <option value="" disabled selected>Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary wizard-next-btn" onclick="wizardNext(1)">Next <i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="wizard-step" id="wizardStep2" style="display:none;">
+                <div class="wizard-icon">📏</div>
+                <h2>Your measurements</h2>
+                <p class="wizard-desc">Used to calculate your BMR accurately</p>
+                <div class="wizard-form">
+                    <div class="wizard-row">
+                        <div class="wizard-input-labeled">
+                            <input type="number" id="wHeight" placeholder="Height" min="100" max="250"
+                                class="wizard-input" required>
+                            <span class="wizard-unit">cm</span>
+                        </div>
+                        <div class="wizard-input-labeled">
+                            <input type="number" id="wWeight" placeholder="Weight" min="30" max="300"
+                                class="wizard-input" required>
+                            <span class="wizard-unit">kg</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn btn-secondary" onclick="wizardBack(2)"><i class="fas fa-arrow-left"></i>
+                        Back</button>
+                    <button class="btn btn-primary" onclick="wizardNext(2)">Next <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="wizard-step" id="wizardStep3" style="display:none;">
+                <div class="wizard-icon">🏃</div>
+                <h2>How active are you?</h2>
+                <p class="wizard-desc">Average exercise per week</p>
+                <div class="wizard-activity-grid">
+                    <label class="activity-card"><input type="radio" name="wActivity" value="1.2">
+                        🛋️<br><strong>Sedentary</strong><small>Little/no exercise</small></label>
+                    <label class="activity-card"><input type="radio" name="wActivity" value="1.375">
+                        🚶<br><strong>Light</strong><small>1–3 days/week</small></label>
+                    <label class="activity-card"><input type="radio" name="wActivity" value="1.55">
+                        🏊<br><strong>Moderate</strong><small>3–5 days/week</small></label>
+                    <label class="activity-card"><input type="radio" name="wActivity" value="1.725">
+                        🏋️<br><strong>Active</strong><small>6–7 days/week</small></label>
+                    <label class="activity-card"><input type="radio" name="wActivity" value="1.9"> 🔥<br><strong>Very
+                            Active</strong><small>Intense daily</small></label>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn btn-secondary" onclick="wizardBack(3)"><i class="fas fa-arrow-left"></i>
+                        Back</button>
+                    <button class="btn btn-primary" onclick="wizardNext(3)">Next <i
+                            class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="wizard-step" id="wizardStep4" style="display:none;">
+                <div class="wizard-icon">🎯</div>
+                <h2>What's your goal?</h2>
+                <p class="wizard-desc">We'll adjust your calorie target accordingly</p>
+                <div class="wizard-goal-grid">
+                    <label class="goal-card"><input type="radio" name="wGoal" value="-500"> ⬇️<br><strong>Lose
+                            Weight</strong><small>~0.5 kg/week</small></label>
+                    <label class="goal-card"><input type="radio" name="wGoal" value="0" checked>
+                        ⚖️<br><strong>Maintain</strong><small>Current weight</small></label>
+                    <label class="goal-card"><input type="radio" name="wGoal" value="300"> ⬆️<br><strong>Gain
+                            Weight</strong><small>Lean muscle</small></label>
+                </div>
+                <div class="wizard-result" id="wizardResult" style="display:none;">
+                    <div class="wizard-result-label">Your estimated daily goal</div>
+                    <div class="wizard-result-value" id="wizardResultValue">— kcal</div>
+                    <div class="wizard-result-sub" id="wizardResultSub"></div>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn btn-secondary" onclick="wizardBack(4)"><i class="fas fa-arrow-left"></i>
+                        Back</button>
+                    <button class="btn btn-primary" id="wizardCalcBtn" onclick="wizardCalculate()">Calculate My Goal
+                        🔥</button>
+                </div>
+                <div style="margin-top:1rem; display:none;" id="wizardConfirmRow">
+                    <button class="btn btn-primary" onclick="wizardConfirm()" style="width:100%;">Start Tracking
+                        🚀</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main App Layout -->
+    <div class="app-wrapper">
+        <!-- Persistent Left Sidebar (Visible when logged in) -->
+        <aside id="leftSidebar" class="left-sidebar" style="display:none;">
+            <div class="sidebar-brand">
+                <span class="logo-emoji">🍛</span>
+                <h2>FoodSight AI</h2>
+            </div>
+
+            <div class="sidebar-scroll-area">
+                <!-- Circular Progress Summary -->
+                <div class="sidebar-progress-container">
+                    <svg viewBox="0 0 36 36" class="circular-chart-sidebar">
+                        <path class="circle-bg"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path class="circle" id="sidebarCircleFill" stroke-dasharray="0, 100"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="sidebar-progress-text">
+                        <span id="sidebarKcalLeftValue" class="val">2000</span>
+                        <span id="sidebarKcalLeftLabel" class="lbl">Remaining</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-progress-stats">
+                    <div class="stat"><span id="sidebarEaten">0</span><small>Eaten</small></div>
+                    <div class="stat"><span id="sidebarGoal">2000</span><small>Goal</small></div>
+                </div>
+
+                <!-- Macros Breakdown -->
+                <div class="sidebar-macros">
+                    <div class="macro-box">
+                        <div class="lbl">Protein</div>
+                        <div class="val" id="sidebarMacroP">0g</div>
+                    </div>
+                    <div class="macro-box">
+                        <div class="lbl">Carbs</div>
+                        <div class="val" id="sidebarMacroC">0g</div>
+                    </div>
+                    <div class="macro-box">
+                        <div class="lbl">Fats</div>
+                        <div class="val" id="sidebarMacroF">0g</div>
+                    </div>
+                </div>
+
+                <!-- Meal Log -->
+                <div class="sidebar-meal-log">
+                    <div class="meal-log-header">
+                        <h3>📋 Today's Meals</h3>
+                        <button id="resetDayBtn" class="tracker-reset-btn"><i class="fas fa-redo"></i> Reset</button>
+                    </div>
+                    <div id="mealLogContent">
+                        <p style="color:var(--text-muted); text-align:center; padding:1rem;">No meals logged yet. Start
+                            scanning! 🍽️</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar"><i class="fas fa-user-circle"></i></div>
+                    <div class="name-col">
+                        <span id="sidebarUserName">User</span>
+                        <small>Free Plan</small>
+                    </div>
+                </div>
+                <button id="sidebarLogoutBtn" class="btn-sidebar-logout"><i class="fas fa-sign-out-alt"></i> Sign
+                    Out</button>
+            </div>
+        </aside>
+
+        <!-- Main Container -->
+        <div class="container main-content-area">
+
+            <!-- Header Section -->
+            <header class="header">
+                <div class="header-top"
+                    style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem;">
+                    <div id="userGreeting"
+                        style="color: var(--text-secondary); font-size: 0.9rem; display:none; align-items:center; gap:0.5rem;">
+                        <i class="fas fa-user-circle" style="color: var(--accent-color);"></i>
+                        <span id="greetingText">Hi there!</span>
+                    </div>
+                    <div id="authContainer" style="display: flex; gap: 0.5rem; margin-left: auto;">
+                        <button id="historyBtn" class="btn btn-secondary"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem; display: none;">
+                            <i class="fas fa-utensils"></i> Meals
+                        </button>
+                        <a href="/profile" id="profileLinkBtn" class="btn btn-secondary"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem; display: none; text-decoration: none;">
+                            <i class="fas fa-user-circle"></i> Profile
+                        </a>
+                        <button id="loginBtn" class="btn btn-secondary"
+                            style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </div>
+                </div>
+                <div class="logo">🍛</div>
+                <h1>FoodSight AI</h1>
+                <p class="subtitle">Identify 100+ Indian dishes instantly with AI-powered recognition</p>
+
+                <!-- Header Calorie Tracker removed, now in sidebar -->
+                <!-- Daily Summary Card -->
+                <div class="daily-summary-container" id="dailySummaryContainer" style="margin-top: var(--spacing-lg);">
+                    <!-- Will be populated by JS -->
+                </div>
+
+                <!-- Session Selector -->
+                <div style="margin-top: 1rem; text-align: center;">
+                    <select id="sessionSelect"
+                        style="background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; border-radius: 20px; outline: none; cursor: pointer; appearance: none; -webkit-appearance: none; padding-right: 2rem; background-image: url('data:image/svg+xml;utf8,<svg fill=\'white\' height=\'24\' viewBox=\'0 0 24 24\' width=\'24\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/><path d=\'M0 0h24v24H0z\' fill=\'none\'/></svg>'); background-repeat: no-repeat; background-position: right 0.7rem center;">
+                        <option value="Breakfast" style="background: var(--bg-primary); color: white;">Breakfast 🍳
+                        </option>
+                        <option value="Lunch" style="background: var(--bg-primary); color: white;">Lunch 🍛</option>
+                        <option value="Snack" style="background: var(--bg-primary); color: white;">Snack ☕</option>
+                        <option value="Dinner" style="background: var(--bg-primary); color: white;">Dinner 🍽️</option>
+                    </select>
+                    <script>
+                        const hour = new Date().getHours();
+                        const selector = document.getElementById('sessionSelect');
+                        if (hour >= 5 && hour < 11) selector.value = 'Breakfast';
+                        else if (hour >= 11 && hour < 16) selector.value = 'Lunch';
+                        else if (hour >= 16 && hour < 19) selector.value = 'Snack';
+                        else selector.value = 'Dinner';
+                    </script>
+                </div>
+            </header>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="glass-card">
+                    <!-- Search Section -->
+                    <div class="search-container mb-3">
+                        <h3 class="text-center" style="font-size: 1.2rem; color: var(--text-secondary);">Search for Food
+                            Items</h3>
+                        <div class="search-bar-wrapper" style="position: relative; max-width: 500px; margin: 0 auto;">
+                            <input type="text" id="foodSearchInput" placeholder="Ex: Biryani, Masala Dosa..."
+                                style="width: 100%; padding: 1rem 3.5rem 1rem 1.5rem; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; outline: none;">
+                            <button id="searchBtn"
+                                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 1.2rem;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="separator"
+                        style="display: flex; align-items: center; text-align: center; margin: 2rem 0; color: var(--text-muted); font-size: 0.9rem;">
+                        <hr style="flex: 1; border: none; border-top: 1px solid var(--glass-border);">
+                        <span style="padding: 0 1rem;">OR</span>
+                        <hr style="flex: 1; border: none; border-top: 1px solid var(--glass-border);">
+                    </div>
+
+                    <h2 class="text-center">Upload Your Food Image</h2>
+                    <p class="text-center" style="color: var(--text-muted); margin-bottom: var(--spacing-lg);">
+                        Drag and drop or click to select an image
+                    </p>
+
+                    <!-- Upload Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <!-- Replaced emoji with a more modern SVG icon if preferred, or keep emoji with new styling -->
+                            <span
+                                style="display: inline-block; filter: drop-shadow(0 0 10px rgba(121, 40, 202, 0.5));">☁️</span>
+                        </div>
+                        <p class="upload-text">Drag & Drop your food image here</p>
+                        <p class="upload-hint">or <span style="color: var(--accent-color); font-weight: 600;">click to
+                                browse</span></p>
+                        <p class="upload-hint" style="margin-top: var(--spacing-sm); font-size: 0.8rem; opacity: 0.7;">
+                            Supports: JPG, PNG, GIF, BMP (Max 16MB)
+                        </p>
+
+                        <div class="upload-actions"
+                            style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+                            <button id="cameraBtn" class="btn btn-secondary"
+                                style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.1);">
+                                <i class="fas fa-camera"></i> Use Camera
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="fileInput" accept="image/*">
+
+                    <!-- Preview Section -->
+                    <div class="preview-section" id="previewSection">
+                        <div class="preview-container">
+                            <img id="previewImage" class="preview-image" alt="Preview">
+                            <button class="remove-btn" id="removeBtn" title="Remove image">×</button>
+                        </div>
+
+                        <div class="text-center">
+                            <button class="btn btn-primary" id="predictBtn">
+                                🔮 Classify This Dish
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading Section -->
+                    <div class="loading" id="loadingSection">
+                        <div class="spinner"></div>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                            Analyzing your image...
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 0.95rem;">
+                            Our AI is identifying the dish
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="resultsSection">
+                <div class="glass-card">
+                    <div class="result-header">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%;">
+                            <h2>🎯 Prediction Results</h2>
+                            <button class="share-btn" id="shareBtn" title="Share your healthy meal!">
+                                <i class="fas fa-share-alt"></i> Share Card
+                            </button>
+                        </div>
+                        <div class="header-main-flex">
+                            <div class="prediction-info">
+                                <p class="predicted-dish" id="predictedDish">Masala Dosa</p>
+                                <div class="confidence-score" id="confidenceScore">94.5%</div>
+                                <p style="color: var(--text-muted);">Confidence Score</p>
+                            </div>
+                            <div class="health-score-meter-container" id="healthScoreMeter">
+                                <!-- Health Score SVG Meter inserted here by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ALLERGY WARNINGS (NEW) -->
+                    <div id="allergyWarningContainer"
+                        style="display: none; background: rgba(245, 87, 108, 0.2); border: 1px solid rgba(245, 87, 108, 0.5); padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; color: #fff; animation: fadeIn 0.5s ease;">
+                    </div>
+
+                    <div class="predictions-list">
+                        <h3 style="margin-bottom: var(--spacing-md); color: var(--text-primary);">
+                            📊 Detailed Predictions
+                        </h3>
+                        <div id="top3Predictions">
+                            <!-- Predictions will be inserted here by JavaScript -->
+                        </div>
+
+                        <!-- Portion Selector -->
+                        <div class="portion-selector" id="portionSelector"
+                            style="display: none; margin-top: var(--spacing-lg);">
+                            <h4
+                                style="color: var(--text-secondary); margin-bottom: var(--spacing-sm); font-size: 0.95rem;">
+                                Adjust Quantity:</h4>
+                            <div class="portion-flex-controls">
+                                <input type="number" id="portionQuantity" value="1" min="0.1" step="0.1">
+
+                                <select id="portionUnit">
+                                    <option value="pieces">Pieces / Serving</option>
+                                    <option value="grams">Grams (g)</option>
+                                    <option value="ml">Milliliters (ml)</option>
+                                </select>
+
+                                <button id="recalculateBtn" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i> Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dietary Suitability Section -->
+                    <div id="suitabilitySection" class="suitability-section">
+                        <!-- Who can/cannot eat will be inserted here by JS -->
+                    </div>
+
+                    <!-- Nutrition Section -->
+                    <div id="nutritionSection">
+                        <!-- Nutrition information will be inserted here by JavaScript -->
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button class="btn btn-primary" onclick="location.reload()">
+                            🔄 Try Another Image
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="samples-section">
+                <div class="glass-card">
+                    <h2 class="text-center">🤖 About FoodSight AI</h2>
+                    <p class="text-center" style="color: var(--text-secondary); max-width: 700px; margin: 0 auto;">
+                        FoodSight AI uses a state-of-the-art deep learning model (MobileNetV3Large) trained on
+                        <strong>100 popular Indian dishes</strong> to provide instant classification and nutritional
+                        insights.
+                        Our system leverages a dataset of 55,000+ images to ensure high accuracy and robust performance.
+                    </p>
+
+                    <div style="margin-top: var(--spacing-lg); text-align: center;">
+                        <h3 style="color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                            🍛 Recognized Dishes
+                        </h3>
+                        <div class="samples-grid">
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Biryani</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Butter Naan</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Chole Bhature</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Dal Makhani</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Dosa</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Idli</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Paneer Tikka</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Samosa</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Pav Bhaji</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Gulab Jamun</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Rasgulla</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Tandoori Chicken</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Vada Pav</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Pani Puri</div>
+                            <div class="glass-card" style="padding: 10px; text-align: center;">Rajma Chawal</div>
+                        </div>
+                        <p class="text-center mt-2" style="font-size: 0.9rem; opacity: 0.7;">...and many more from 100+
+                            classes!</p>
+                    </div>
+
+                    <div style="margin-top: var(--spacing-lg); text-align: center;">
+                        <h3 style="color: var(--text-primary); margin-bottom: var(--spacing-md);">
+                            ⚡ Key Features
+                        </h3>
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-md); margin-top: var(--spacing-md);">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: var(--spacing-xs);">🚀</div>
+                                <strong style="color: var(--text-primary);">Fast</strong>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--spacing-xs);">
+                                    Results in &lt;1 second</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: var(--spacing-xs);">🎯</div>
+                                <strong style="color: var(--text-primary);">Accurate</strong>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--spacing-xs);">
+                                    95.75% accuracy</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: var(--spacing-xs);">📱</div>
+                                <strong style="color: var(--text-primary);">Responsive</strong>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--spacing-xs);">
+                                    Works
+                                    on all devices</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2rem; margin-bottom: var(--spacing-xs);">🔒</div>
+                                <strong style="color: var(--text-primary);">Private</strong>
+                                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: var(--spacing-xs);">
+                                    Images not stored</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <p>&copy; FoodSight AI: Al-Based Food Classification App for Calorie and Nutrition Estimation</p>
+                <p style="font-size: 0.9rem; margin-top: var(--spacing-xs);">
+                    Built using TensorFlow , Flask, and MobileNetV3
+                </p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link" id="aboutLink">About</a>
+                    <a href="/api/health" class="footer-link" target="_blank">API Status</a>
+                    <a href="https://github.com" class="footer-link" target="_blank">GitHub</a>
+                </div>
+            </footer>
+
+        </div>
+
+
+
+        <!-- Camera Modal -->
+        <div id="cameraModal" class="modal">
+            <div class="modal-content glass-card" style="max-width: 600px; padding: 0; overflow: hidden;">
+                <div class="modal-header"
+                    style="padding: 1rem; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; color: white;"><i class="fas fa-camera"></i> Take Photo</h3>
+                    <span class="close-modal" id="closeCameraModal">&times;</span>
+                </div>
+                <div class="camera-container"
+                    style="position: relative; width: 100%; aspect-ratio: 4/3; background: #000;">
+                    <video id="cameraVideo" autoplay playsinline
+                        style="width: 100%; height: 100%; object-fit: cover;"></video>
+                    <canvas id="cameraCanvas" style="display: none;"></canvas>
+                    <div class="camera-overlay"
+                        style="position: absolute; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; gap: 1rem;">
+                        <button id="captureBtn" class="btn btn-primary"
+                            style="border-radius: 50%; width: 60px; height: 60px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 4px solid rgba(255,255,255,0.3);">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                        <button id="switchCameraBtn" class="btn btn-secondary"
+                            style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden Share Card Template (Off-screen) -->
+        <div id="shareCardContainer"
+            style="position: fixed; left: -9999px; top: 0; width: 400px; background: #1a1a2e; padding: 20px; border-radius: 20px; color: white; font-family: 'Outfit', sans-serif;">
+            <div
+                style="background: linear-gradient(135deg, #1a1a2e, #16213e); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; padding: 20px; text-align: center;">
+                <h2 style="color: #4ecdc4; margin: 0 0 15px 0; font-size: 1.5rem;">FoodSight AI 👁️</h2>
+                <div
+                    style="width: 100%; aspect-ratio: 1; border-radius: 12px; overflow: hidden; margin-bottom: 15px; border: 2px solid rgba(255,255,255,0.1);">
+                    <img id="shareCardImage" src="" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <h3 id="shareCardDish"
+                    style="font-size: 1.8rem; margin: 10px 0; background: linear-gradient(45deg, #4ecdc4, #556270); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Dish Name</h3>
+
+                <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0;">
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; min-width: 80px;">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #ff6b6b;" id="shareCardCal">0</div>
+                        <div style="font-size: 0.8rem; color: #888;">Calories</div>
+                    </div>
+                    <div
+                        style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px; min-width: 80px;">
+                        <div style="font-size: 1.2rem; font-weight: bold; color: #4ecdc4;" id="shareCardProt">0g</div>
+                        <div style="font-size: 0.8rem; color: #888;">Protein</div>
+                    </div>
+                </div>
+                <div style="font-size: 0.8rem; color: #666; margin-top: 10px;">Scanned with FoodSight AI</div>
+            </div>
+        </div>
+
+        <!-- About Modal -->
+        <div id="aboutModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>About FoodSight AI</h2>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="about-section">
+                        <h3>🎯 Project Overview</h3>
+                        <p>FoodSight AI is an advanced deep learning application for Indian food classification and
+                            nutrition estimation. Using state-of-the-art computer vision, we help users make informed
+                            dietary choices by identifying dishes and providing comprehensive nutritional information.
+                        </p>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>✨ Key Features</h3>
+                        <div class="features-grid">
+                            <div class="feature-item">
+                                <span class="feature-icon">🤖</span>
+                                <strong>AI Classification</strong>
+                                <p>100 Indian dishes with 91% accuracy</p>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🥗</span>
+                                <strong>Nutrition Database</strong>
+                                <p>Complete macro & micronutrient data</p>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🏥</span>
+                                <strong>Health Monitoring</strong>
+                                <p>Smart dietary alerts & score meter</p>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📊</span>
+                                <strong>Portion Control</strong>
+                                <p>Dynamic serving size adjustments</p>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">🎨</span>
+                                <strong>Premium UI</strong>
+                                <p>Modern design with glassmorphism</p>
+                            </div>
+                            <div class="feature-item">
+                                <span class="feature-icon">📜</span>
+                                <strong>Daily Summary</strong>
+                                <p>Track your nutrition intake for the day</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>🛠️ Technology Stack</h3>
+                        <div class="tech-stack">
+                            <div class="tech-category">
+                                <strong>Machine Learning</strong>
+                                <ul>
+                                    <li>TensorFlow 2.15+</li>
+                                    <li>MobileNetV3 Architecture</li>
+                                    <li>55,364 Training Images</li>
+                                    <li>Advanced Fine-Tuning</li>
+                                </ul>
+                            </div>
+                            <div class="tech-category">
+                                <strong>Backend</strong>
+                                <ul>
+                                    <li>Python 3.10+</li>
+                                    <li>Flask Web Framework</li>
+                                    <li>REST API</li>
+                                    <li>Custom Nutrition Algorithm</li>
+                                </ul>
+                            </div>
+                            <div class="tech-category">
+                                <strong>Frontend</strong>
+                                <ul>
+                                    <li>HTML5 & CSS3</li>
+                                    <li>Vanilla JavaScript (ES6+)</li>
+                                    <li>SVG Animations</li>
+                                    <li>LocalStorage API</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>📈 Performance Metrics</h3>
+                        <div class="metrics-grid">
+                            <div class="metric-card">
+                                <div class="metric-value">91.45%</div>
+                                <div class="metric-label">Training Accuracy</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">97.80%</div>
+                                <div class="metric-label">Top-3 Accuracy</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">100</div>
+                                <div class="metric-label">Food Classes</div>
+                            </div>
+                            <div class="metric-card">
+                                <div class="metric-value">&lt;0.3s</div>
+                                <div class="metric-label">Inference Time</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile/History Modal -->
+        <div id="profileModal" class="modal">
+            <div class="modal-content glass-card" style="max-width: 600px; padding: var(--spacing-lg);">
+                <div class="modal-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                    <h2 style="margin: 0;"><i class="fas fa-history"></i> Your Scan History</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button id="clearHistoryBtn" class="btn btn-secondary"
+                            style="padding: 0.4rem 0.8rem; font-size: 0.8rem; color: #ff6b6b; border-color: rgba(255,107,107,0.3);">
+                            <i class="fas fa-trash-alt"></i> Clear
+                        </button>
+                        <span class="close-modal" id="closeProfileModal"
+                            style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div id="persistentHistoryList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- History items will be injected here -->
+                        <p class="text-center" style="color: var(--text-muted);">No history found. Start scanning!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Modal -->
+        <div id="authModal" class="modal">
+            <div class="modal-content glass-card" style="max-width: 400px; padding: var(--spacing-lg);">
+                <div class="modal-header"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                    <h2 id="authModalTitle" style="margin: 0;">Login</h2>
+                    <span class="close-modal" id="closeAuthModal"
+                        style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="form-group mb-2">
+                            <label
+                                style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Username</label>
+                            <input type="text" id="loginUsername" required
+                                style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; outline: none;">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label
+                                style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Password</label>
+                            <input type="password" id="loginPassword" required
+                                style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; outline: none;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                        <p class="text-center mt-2" style="font-size: 0.9rem; color: var(--text-muted);">
+                            Don't have an account? <a href="#" id="toggleSignup"
+                                style="color: var(--accent-color); text-decoration: none;">Sign Up</a>
+                        </p>
+                    </form>
+
+                    <form id="signupForm" style="display: none;">
+                        <div class="form-group mb-2">
+                            <label
+                                style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Username</label>
+                            <input type="text" id="signupUsername" required
+                                style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; outline: none;">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label
+                                style="display: block; margin-bottom: 5px; color: var(--text-secondary);">Password</label>
+                            <input type="password" id="signupPassword" required
+                                style="width: 100%; padding: 0.8rem; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; outline: none;">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+                        <p class="text-center mt-2" style="font-size: 0.9rem; color: var(--text-muted);">
+                            Already have an account? <a href="#" id="toggleLogin"
+                                style="color: var(--accent-color); text-decoration: none;">Login</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- JavaScript -->
+        <script src="{{ url_for('static', filename='js/auth_tracker.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,203 @@
+/* ============================================================================
+   FoodSight AI - Premium Features CSS
+   ============================================================================ */
+
+/* Header Multi-Flex */
+.header-main-flex {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.prediction-info {
+    flex: 1;
+    min-width: 250px;
+}
+
+/* Health Score Meter */
+.health-score-meter-container {
+    flex: 0 0 150px;
+    height: 150px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.health-meter-svg {
+    width: 150px;
+    height: 150px;
+    transform: rotate(-90deg);
+}
+
+.health-meter-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.health-meter-progress {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s ease;
+}
+
+.health-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    display: block;
+}
+
+.score-label {
+    font-size: 0.75rem;
+    color: #6b6b8c;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Daily Summary Card */
+.daily-summary-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.daily-summary-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    width: 100%;
+    max-width: 700px;
+    animation: fadeIn 0.8s ease;
+}
+
+.summary-stat {
+    flex: 1;
+    text-align: center;
+}
+
+.summary-value {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #667eea;
+    margin-bottom: 2px;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    color: #b8b8d1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Dietary Suitability */
+.suitability-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.suitability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.suitability-column h4 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+}
+
+.suitability-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suitability-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    border-left: 4px solid transparent;
+    transition: transform 0.2s ease;
+}
+
+.suitability-item:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.suitability-item.can {
+    border-left-color: #2ecc71;
+}
+
+.suitability-item.cannot {
+    border-left-color: #f5576c;
+}
+
+.suitability-item strong {
+    display: block;
+    color: #fff;
+    margin-bottom: 2px;
+}
+
+.suitability-item span {
+    color: #b8b8d1;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+    .suitability-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .daily-summary-card {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .summary-stat {
+        width: 100%;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 0.5rem;
+    }
+
+    .summary-stat:last-child {
+        border-bottom: none;
+    }
+}

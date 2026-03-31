@@ -1,0 +1,91 @@
+/* ============================================================================
+   CIRCULAR CHARTS
+   ============================================================================ */
+
+.circular-charts {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    margin-top: var(--spacing-md);
+}
+
+.circular-chart {
+    position: relative;
+    width: 120px;
+    text-align: center;
+    transition: transform var(--transition-normal);
+}
+
+.circular-chart:hover {
+    transform: scale(1.1);
+}
+
+.circular-chart-svg {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 250px;
+}
+
+.circular-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 8;
+}
+
+.circular-progress {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s ease-out;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+.circular-progress.protein {
+    stroke: url(#proteinGradient);
+}
+
+.circular-progress.carbs {
+    stroke: url(#carbsGradient);
+}
+
+.circular-progress.fats {
+    stroke: url(#fatsGradient);
+}
+
+.circular-label {
+    margin-top: var(--spacing-sm);
+}
+
+.circular-value {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.circular-name {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+.delay-1 {
+    animation-delay: 0.2s;
+}
+
+.delay-2 {
+    animation-delay: 0.4s;
+}
+
+.delay-3 {
+    animation-delay: 0.6s;
+}

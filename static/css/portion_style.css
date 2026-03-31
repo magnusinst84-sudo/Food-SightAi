@@ -1,0 +1,120 @@
+/* FoodSight AI - Portion Selector Premium Styles */
+
+.portion-selector {
+    animation: fadeInSlideUp 0.6s var(--transition-spring);
+}
+
+.portion-flex-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all var(--transition-normal);
+}
+
+.portion-flex-controls:focus-within {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 20px rgba(121, 40, 202, 0.2);
+}
+
+/* Quantity Input Styling */
+#portionQuantity {
+    width: 85px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.6rem;
+    border-radius: var(--radius-sm);
+    outline: none;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+#portionQuantity:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 10px rgba(0, 124, 240, 0.3);
+}
+
+/* Unit Select Styling */
+#portionUnit {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    padding: 0.6rem 2.5rem 0.6rem 1rem;
+    border-radius: var(--radius-sm);
+    outline: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-family: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' width='18px' height='18px'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    transition: all var(--transition-fast);
+}
+
+#portionUnit:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* Styling for select options is limited in browsers, but we can set background */
+#portionUnit option {
+    background: #1a1a2e; /* Match theme background */
+    color: white;
+    padding: 10px;
+}
+
+/* Recalculate Button */
+#recalculateBtn {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+#recalculateBtn i {
+    font-size: 0.8rem;
+    transition: transform 0.4s ease;
+}
+
+#recalculateBtn:hover i {
+    transform: rotate(180deg);
+}
+
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+    .portion-flex-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    #portionQuantity {
+        width: 100%;
+    }
+}

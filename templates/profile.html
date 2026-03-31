@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodSight AI - Profile</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/premium_features.css') }}">
+    <style>
+        .profile-section {
+            max-width: 800px;
+            margin: 2rem auto;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group-profile label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group-profile input,
+        .form-group-profile select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .form-group-profile input:focus,
+        .form-group-profile select:focus {
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header"
+            style="text-align: left; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <a href="/"
+                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="logo" style="width: 40px; height: 40px; font-size: 1.5rem;">🍛</span>
+                    <h2 style="margin: 0; font-size: 1.5rem;">FoodSight AI</h2>
+                </a>
+            </div>
+            <div>
+                <a href="/" class="btn btn-secondary"><i class="fas fa-home"></i> Home</a>
+            </div>
+        </header>
+
+        <section class="profile-section relative">
+            <div class="glass-card">
+                <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1rem;">
+                    <i class="fas fa-user-circle" style="color: var(--primary-color);"></i> Your Profile
+                </h2>
+
+                <form id="profileForm">
+                    <div class="form-grid">
+                        <!-- Basic Info -->
+                        <div class="form-group-profile">
+                            <label>Username</label>
+                            <input type="text" id="username" readonly style="opacity: 0.7; cursor: not-allowed;">
+                        </div>
+                        <div class="form-group-profile">
+                            <label>Age</label>
+                            <input type="number" id="age" min="1" max="120" placeholder="e.g. 25">
+                        </div>
+                        <div class="form-group-profile">
+                            <label>Height (cm)</label>
+                            <input type="number" id="height" step="0.1" placeholder="e.g. 175">
+                        </div>
+                        <div class="form-group-profile">
+                            <label>Weight (kg)</label>
+                            <input type="number" id="weight" step="0.1" placeholder="e.g. 70">
+                        </div>
+
+                        <!-- Goals & Activity -->
+                        <div class="form-group-profile">
+                            <label>Activity Level</label>
+                            <select id="activity_level">
+                                <option value="sedentary">Sedentary (little or no exercise)</option>
+                                <option value="light">Lightly active (light exercise 1-3 days/week)</option>
+                                <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
+                                <option value="active">Active (hard exercise 6-7 days a week)</option>
+                                <option value="very_active">Very active (very hard exercise & physical job)</option>
+                            </select>
+                        </div>
+                        <div class="form-group-profile" style="grid-column: 1 / -1;">
+                            <label>Dietary Restrictions / Allergies (comma separated)</label>
+                            <input type="text" id="allergies" placeholder="e.g. dairy, gluten, peanuts">
+                            <small style="color: var(--text-muted); margin-top: 0.5rem; display: block;">These will be
+                                used to warn you if a scanned dish contains allergens.</small>
+                        </div>
+
+                        <div class="form-group-profile">
+                            <label>Daily Calorie Target (kcal)</label>
+                            <input type="number" id="daily_cal_target" placeholder="e.g. 2000">
+                        </div>
+                        <div class="form-group-profile">
+                            <label>Daily Protein Target (g)</label>
+                            <input type="number" id="daily_protein_target" placeholder="e.g. 120">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                        <button type="button" id="calculateMacrosBtn" class="btn btn-secondary">
+                            <i class="fas fa-calculator"></i> Auto-Calculate Goals
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loadingOverlay"
+                style="display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.5); border-radius: 20px; z-index: 10; align-items: center; justify-content: center;">
+                <div class="spinner"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- JavaScript for Profile Page -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.style.display = 'flex';
+
+            try {
+                // Fetch Profile Data
+                const res = await fetch('/api/profile');
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        window.location.href = '/'; // redirect to home if not logged in
+                        return;
+                    }
+                    throw new Error('Failed to load profile');
+                }
+                const data = await res.json();
+
+                if (data.success && data.profile) {
+                    document.getElementById('username').value = data.profile.username || '';
+                    document.getElementById('age').value = data.profile.age || '';
+                    document.getElementById('height').value = data.profile.height || '';
+                    document.getElementById('weight').value = data.profile.weight || '';
+                    if (data.profile.activity_level) {
+                        document.getElementById('activity_level').value = data.profile.activity_level;
+                    }
+                    document.getElementById('allergies').value = data.profile.allergies || '';
+                    document.getElementById('daily_cal_target').value = data.profile.daily_cal_target || '';
+                    document.getElementById('daily_protein_target').value = data.profile.daily_protein_target || '';
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Could not load profile. Please try again later.');
+            } finally {
+                overlay.style.display = 'none';
+            }
+
+            // Save Profile Handler
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                overlay.style.display = 'flex';
+
+                const payload = {
+                    age: parseInt(document.getElementById('age').value) || null,
+                    height: parseFloat(document.getElementById('height').value) || null,
+                    weight: parseFloat(document.getElementById('weight').value) || null,
+                    activity_level: document.getElementById('activity_level').value,
+                    allergies: document.getElementById('allergies').value,
+                    daily_cal_target: parseInt(document.getElementById('daily_cal_target').value) || null,
+                    daily_protein_target: parseInt(document.getElementById('daily_protein_target').value) || null,
+                };
+
+                try {
+                    const res = await fetch('/api/profile', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        alert('Profile saved successfully!');
+                    } else {
+                        alert(data.message || 'Failed to save profile.');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('An error occurred while saving profile.');
+                } finally {
+                    overlay.style.display = 'none';
+                }
+            });
+
+            // Auto Calculate Macro logic
+            document.getElementById('calculateMacrosBtn').addEventListener('click', () => {
+                const age = parseInt(document.getElementById('age').value);
+                const weight = parseFloat(document.getElementById('weight').value);
+                const height = parseFloat(document.getElementById('height').value);
+                const activityLevel = document.getElementById('activity_level').value;
+
+                if (!age || !weight || !height) {
+                    alert('Please enter Age, Weight, and Height to calculate goals.');
+                    return;
+                }
+
+                // Mifflin-St Jeor Equation (simplified average for male/female)
+                let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+                bmr -= 75;
+
+                const multipliers = {
+                    'sedentary': 1.2,
+                    'light': 1.375,
+                    'moderate': 1.55,
+                    'active': 1.725,
+                    'very_active': 1.9
+                };
+
+                const calories = Math.round(bmr * multipliers[activityLevel]);
+                const protein = Math.round(weight * 1.8);
+
+                document.getElementById('daily_cal_target').value = calories;
+                document.getElementById('daily_protein_target').value = protein;
+
+                alert(`Calculated Targets:\nCalories: ${calories} kcal\nProtein: ${protein} g`);
+            });
+        });
+    </script>
+</body>
+
+</html>
